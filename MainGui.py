@@ -209,9 +209,10 @@ class testThread(Thread):
                     f.write(str(item))
                     f.write(',')
                     if counter == 32:
-                        if self.TMS_Mark == True:
+                        if self.TMS_Mark == True or interface.TMS_Mark == True:
                             print 'checkarooni'
                             self.TMS_Mark = False
+                            interface.TMS_Mark = False
                             f.write('1')
                         else:
                             f.write('0')
@@ -251,21 +252,56 @@ class testThread(Thread):
 
 class testGUI(wx.Frame): 
     def __init__(self): 
-        wx.Frame.__init__(self, None, -1, "EEG/TMS Panel", size=(500,400)) 
+        wx.Frame.__init__(self, None, -1, "EEG/TMS Panel", size=(500,700)) 
         panel = wx.Panel(self, -1)
 
+        self.FileText = wx.StaticText(panel, label="Filename:", pos=(30, 30))
         self.buttonFilename = wx.Button(panel, -1, label="Choose Filename", pos=(30,60))
-        self.FileText = wx.StaticText(panel, label="Filename:", pos = (30, 30))
         
         self.buttonConnect = wx.Button(panel, -1, label="Open Fixation Screen", pos=(30,120))
+        self.buttonTrigger = wx.Button(panel, -1, label="Send TMS Pulse", pos=(360,120))
         self.buttonRecord = wx.Button(panel, -1, label="Begin EEG Recording", pos=(30,180))
         self.buttonGameTime = wx.Button(panel, -1, label="Begin Automated TMS", pos=(30,240))
-        self.buttonTrigger = wx.Button(panel, -1, label="Send TMS Pulse", pos=(360,120))
+        self.buttonTally = wx.Button(panel, -1, label="Tally Responses", pos=(360,240))
+        
+        self.Ratelabel = wx.StaticText(panel, label="Confidence:", pos=(30, 340))
+        self.YESlabel = wx.StaticText(panel, label="YES Phos:", pos=(30, 370))
+        self.NOlabel = wx.StaticText(panel, label="NO Phos:", pos=(30, 400))
+        
+        self.c1 = wx.StaticText(panel, label="1", pos=(140, 340))
+        self.c2 = wx.StaticText(panel, label="2", pos=(210, 340))
+        self.c3 = wx.StaticText(panel, label="3", pos=(280, 340))
+        self.c4 = wx.StaticText(panel, label="4", pos=(350, 340))
+        self.c5 = wx.StaticText(panel, label="5", pos=(420, 340))
+
+        self.y1 = wx.StaticText(panel, label=str(interface.y1), pos=(140, 370))
+        self.y2 = wx.StaticText(panel, label=str(interface.y2), pos=(210, 370))
+        self.y3 = wx.StaticText(panel, label=str(interface.y3), pos=(280, 370))
+        self.y4 = wx.StaticText(panel, label=str(interface.y4), pos=(350, 370))
+        self.y5 = wx.StaticText(panel, label=str(interface.y5), pos=(420, 370))
+
+        self.n1 = wx.StaticText(panel, label=str(interface.n1), pos=(140, 400))
+        self.n2 = wx.StaticText(panel, label=str(interface.n2), pos=(210, 400))
+        self.n3 = wx.StaticText(panel, label=str(interface.n3), pos=(280, 400))
+        self.n4 = wx.StaticText(panel, label=str(interface.n4), pos=(350, 400))
+        self.n5 = wx.StaticText(panel, label=str(interface.n5), pos=(420, 400)) 
+        
+        self.TotalYESLabel = wx.StaticText(panel, label="Confident YES:", pos=(30, 450))        
+        self.TotalYES = wx.StaticText(panel, label=str(0), pos=(140, 450))
+        
+        self.TotalNOLabel = wx.StaticText(panel, label="Confident NO:", pos=(30, 480))        
+        self.TotalNO = wx.StaticText(panel, label=str(0), pos=(140, 480)) 
+        
+        self.TotalStimLabel = wx.StaticText(panel, label="Total Stims:", pos=(30, 510))        
+        self.TotalStims = wx.StaticText(panel, label=str(0), pos=(140, 510)) 
+        
+        
         panel.Bind(wx.EVT_BUTTON, self.Filename, id=self.buttonFilename.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Connect, id=self.buttonConnect.GetId())
         panel.Bind(wx.EVT_BUTTON, self.GameTime, id=self.buttonGameTime.GetId())
-        panel.Bind(wx.EVT_BUTTON, self.Record, id=self.buttonRecord.GetId())
+        panel.Bind(wx.EVT_BUTTON, self.startThread, id=self.buttonRecord.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Trigger, id=self.buttonTrigger.GetId())
+        panel.Bind(wx.EVT_BUTTON, self.Tally, id=self.buttonTally.GetId())
         
         self.sizer = wx.BoxSizer()
         self.sizer.Add(self.FileText, 1)
@@ -299,6 +335,29 @@ class testGUI(wx.Frame):
     def Trigger(self, event):
         print('check')
         self.the_thread.TMS_Mark = True
+        
+    def Tally(self, event):
+    
+        self.y1.SetLabel(str(interface.y1))
+        self.y2.SetLabel(str(interface.y2))
+        self.y3.SetLabel(str(interface.y3))
+        self.y4.SetLabel(str(interface.y4))
+        self.y5.SetLabel(str(interface.y5))
+                         
+
+        self.n1.SetLabel(str(interface.n1))
+        self.n2.SetLabel(str(interface.n2))
+        self.n3.SetLabel(str(interface.n3))
+        self.n4.SetLabel(str(interface.n4))
+        self.n5.SetLabel(str(interface.n5))
+
+        self.TotalYES.SetLabel(str(interface.y3 + interface.y4 + interface.y5))
+        self.TotalNO.SetLabel(str(interface.n3 + interface.n4 + interface.n5))
+        self.TotalStims.SetLabel(str(interface.y1 + interface.y2 + interface.y3 + interface.y4 + interface.y5 +  interface.n1 + interface.n2 + interface.n3 + interface.n4 + interface.n5 ))
+        
+        self.sizer.Layout()
+        self.Refresh()
+        self.Update()    
 
     
     def Filename(self, event):

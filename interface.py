@@ -10,10 +10,40 @@
 import pygame
 import time 
 StimTimer = False
+filename = 'default.csv'
 
+y1 = 0
+y2 = 0
+y3 = 0
+y4 = 0
+y5 = 0
+     
+n1 = 0
+n2 = 0
+n3 = 0
+n4 = 0
+n5 = 0
+
+TMS_Mark = False
 
 def main():
     global StimTimer
+    global y1
+    global y2
+    global y3
+    global y4
+    global y5
+    
+    global n1
+    global n2
+    global n3
+    global n4
+    global n5
+    
+    global TMS_Mark
+    
+    global filename 
+    
     pygame.init()
 
     pygame.display.init()      
@@ -72,6 +102,12 @@ def main():
     StimGuard = time.time() - 10 #This variable prevents stims more frequent than 1 per ten seconds
     SubjectResponseTime = 0
     Stage = 1
+    
+    if filename[-4:] = '.csv'
+        marks = open(filename + '_RESPONSES.csv', 'w')
+    else:
+        marks = open(filename[:-4] +  '_RESPONSES.csv', 'w')
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -83,6 +119,29 @@ def main():
                         print('Take it to the bank boys!')
                         Responses.append(Phosphene)
                         Responses.append(Confidence)
+                        if Phosphene == 1:
+                            if Confidence == 1:
+                                y1 = y1 +1
+                            if Confidence == 2:          
+                                y2 = y2 +1
+                            if Confidence == 3:           
+                                y3 = y3 +1
+                            if Confidence == 4:           
+                                y4 = y4 +1
+                            if Confidence == 5:         
+                                y5 = y5 +1
+                        else:   #meaning if NoPhos   
+                            if Confidence == 1:         
+                                n1 = n1 +1
+                            if Confidence == 2:         
+                                n2 = n2 +1
+                            if Confidence == 3:         
+                                n3 = n3 +1
+                            if Confidence == 4:         
+                                n4 = n4 +1
+                            if Confidence == 5:         
+                                n5 = n5 +1
+                        marks.write(str(Phosphene) + ',' + str(Confidence) + '\n')
                         Confidence = 0
                         Phosphene = 0
                         Stage = 1
@@ -98,7 +157,7 @@ def main():
                         Confidence = 4            
                     if e.collidepoint(pos):
                         Confidence = 5
-                if Stage == 3:
+                if Stage == 4:
                     if A.collidepoint(pos):
                         Phosphene = -1
                     if B.collidepoint(pos):
@@ -117,19 +176,20 @@ def main():
             elif Stage == 2:
                 if CountDownToStim < time.time() + 1:
                     Reticle = True
-                    print('yatta')
                 if CountDownToStim < time.time():
-                    
+                    TMS_Mark = True
                     print('stim happens now')
+                    Stage = 3
+            elif Stage == 3:
                 if CountDownToStim < time.time() - 1:   
                     Reticle = False
                     SubjectResponseTimer = time.time()
-                    Stage = 3
+                    Stage = 4
                     
         
 
         
-        if Stage == 3:
+        if Stage == 4:
             resultSurf = BASICFONT.render('    DID YOU SEE A PHOSPHENE?', True, WHITE)
             resultRect = resultSurf.get_rect()
             resultRect.center = (WINDOWWIDTH/2, 80)
@@ -163,6 +223,9 @@ def main():
         screen.fill(GREY)
         if QuitFlag == True:
             print(Responses)
+            marks.close()
+            
+            
             pygame.quit()
             break
         
