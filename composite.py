@@ -10,7 +10,7 @@ Gilching/Freiburg, Germany
 www.brainproducts.com
 
 """
-
+import interface
 # needs socket and struct library
 from socket import *
 from struct import *
@@ -251,23 +251,31 @@ class testThread(Thread):
 
 class testGUI(wx.Frame): 
     def __init__(self): 
-        wx.Frame.__init__(self, None, -1, "EEG/TMS Panel", size=(500,270)) 
+        wx.Frame.__init__(self, None, -1, "EEG/TMS Panel", size=(500,400)) 
         panel = wx.Panel(self, -1)
 
-        self.buttonFilename = wx.Button(panel, -1, label="Choose Filename", pos=(30,30))
-        self.FileText = wx.StaticText(panel, label="Filename:", pos = (30, 60))
+        self.buttonFilename = wx.Button(panel, -1, label="Choose Filename", pos=(30,60))
+        self.FileText = wx.StaticText(panel, label="Filename:", pos = (30, 30))
         
-        self.buttonConnect = wx.Button(panel, -1, label="Connect to BrainVision", pos=(30,120))
-        self.buttonRecord = wx.Button(panel, -1, label="Begin EEG Recording", pos=(30,150))
-        self.buttonTrigger = wx.Button(panel, -1, label="Send TMS Pulse", pos=(360,150))
+        self.buttonConnect = wx.Button(panel, -1, label="Open Fixation Screen", pos=(30,120))
+        self.buttonRecord = wx.Button(panel, -1, label="Begin EEG Recording", pos=(30,180))
+        self.buttonGameTime = wx.Button(panel, -1, label="Begin Automated TMS", pos=(30,240))
+        self.buttonTrigger = wx.Button(panel, -1, label="Send TMS Pulse", pos=(360,120))
         panel.Bind(wx.EVT_BUTTON, self.Filename, id=self.buttonFilename.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Connect, id=self.buttonConnect.GetId())
+        panel.Bind(wx.EVT_BUTTON, self.GameTime, id=self.buttonGameTime.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Record, id=self.buttonRecord.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Trigger, id=self.buttonTrigger.GetId())
         
+        self.sizer = wx.BoxSizer()
+        self.sizer.Add(self.FileText, 1)
+        #self.sizer.Add(self.button)
+
+
+        panel.SetSizerAndFit(self.sizer)  
+        self.Show()        
         
-        
-        self.buttonConnect.Disable()
+        #self.buttonConnect.Disable()
         self.buttonRecord.Disable()
         
     def startThread(self, event):
@@ -279,8 +287,14 @@ class testGUI(wx.Frame):
 
     def Record(self, event):
         placeholder = True
+        
+    def GameTime(self, event):
+        interface.StimTimer = True
+        print('test')
+        
     def Connect(self, event):
-        self.the_thread = testThread(self)
+        interface.main()
+        #self.the_thread = testThread(self)
         
     def Trigger(self, event):
         print('check')
@@ -317,16 +331,20 @@ class testGUI(wx.Frame):
                 filename = fname
 
             elif response == wx.ID_NO:
-                self.filename = None
+                filename = None
+
             
         else:
             # If the file does not exists, we can proceed
             filename = fname
-        self.FileText.label = "Filename1: "
-        print(["Filename: " + fname])
-        self.buttonConnect.Enable()
-        self.Refresh()
-        self.Update()
+        if filename != None:
+            filestring = "Filename: " + str(fname)
+            self.FileText.SetLabel(filestring)
+            self.sizer.Layout()
+            print(["Filename: " + fname])
+            self.buttonRecord.Enable()
+            self.Refresh()
+            self.Update()
         #NFT.OutputFilename = fname[:-4] + 'MetaData.csv'
         #NFT.ExperimentOutputName = fname[:-4] + 'ContRec.csv'
         #self.update_interface()

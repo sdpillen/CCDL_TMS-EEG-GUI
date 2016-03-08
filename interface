@@ -1,0 +1,26 @@
+import pygame, sys
+from pygame.locals import *
+import numpy as np
+import time
+
+
+# Set up the colours (RGB values)
+BLACK     = (0  ,0  ,0  )
+GREY      = (120  ,120  ,120  )
+WHITE     = (255,255,255)
+YELLOW    = (255,255,0)
+ORANGE    = (255,165,0)
+RED       = (255,0,0)
+CYAN = ( 52, 221, 221)
+
+#Window parameters
+pygame.display.init()      
+disp = pygame.display.Info()
+WINDOWWIDTH = disp.current_w    #I like the screen slightly smaller than window size for ease of portability
+WINDOWHEIGHT = disp.current_h
+size = [WINDOWWIDTH,WINDOWHEIGHT]
+
+
+
+#The number of pixels in pygame line functions, by default
+LINETHICKNESS = 10  
