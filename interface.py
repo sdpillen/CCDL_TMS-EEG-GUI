@@ -45,7 +45,6 @@ def main():
     global filename 
     
     pygame.init()
-
     pygame.display.init()      
     disp = pygame.display.Info()
     WINDOWWIDTH = disp.current_w    
@@ -103,7 +102,7 @@ def main():
     SubjectResponseTime = 0
     Stage = 1
     
-    if filename[-4:] = '.csv'
+    if filename[-4:] == '.csv':
         marks = open(filename + '_RESPONSES.csv', 'w')
     else:
         marks = open(filename[:-4] +  '_RESPONSES.csv', 'w')
@@ -169,8 +168,8 @@ def main():
         if StimTimer == True:
             if Stage == 1:
                 Stage = 2
-                if SubjectResponseTime > 7:
-                    SubjectResponseTime = 7
+                if SubjectResponseTime > 3:
+                    SubjectResponseTime = 3
                 CountDownToStim = time.time() + 8 - SubjectResponseTime
                 print CountDownToStim
             elif Stage == 2:
@@ -192,32 +191,33 @@ def main():
         if Stage == 4:
             resultSurf = BASICFONT.render('    DID YOU SEE A PHOSPHENE?', True, WHITE)
             resultRect = resultSurf.get_rect()
-            resultRect.center = (WINDOWWIDTH/2, 80)
+            resultRect.center = (WINDOWWIDTH/2, 380)
             screen.blit(resultSurf, resultRect)
-            A = screen.blit(NO, (WINDOWWIDTH/2 - 150, 120))
-            B = screen.blit(YES, (WINDOWWIDTH/2 + 150, 120))
+            A = screen.blit(NO, (WINDOWWIDTH/2 - 150, 420))
+            B = screen.blit(YES, (WINDOWWIDTH/2 + 150, 420))
 
         if Reticle == True or StimTimer == False:
             pygame.draw.line(screen, WHITE, ((10+WINDOWWIDTH/2),WINDOWHEIGHT/2),((WINDOWWIDTH/2 - 10),WINDOWHEIGHT/2), (LINETHICKNESS/2))        
             pygame.draw.line(screen, WHITE, ((WINDOWWIDTH/2), 10+WINDOWHEIGHT/2),((WINDOWWIDTH/2),WINDOWHEIGHT/2-10), (LINETHICKNESS/2))
         
         if Phosphene != 0:
-            pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2  + Phosphene*150 - 10  , 110),(120,87)), LINETHICKNESS)
-            a = screen.blit(B1, (WINDOWWIDTH/2 -300, 370))
-            b = screen.blit(B2, (WINDOWWIDTH/2 -150, 370))
-            c = screen.blit(B3, (WINDOWWIDTH/2, 370))
-            d = screen.blit(B4, (WINDOWWIDTH/2 + 150, 370))
-            e = screen.blit(B5, (WINDOWWIDTH/2 + 300, 370))
+            pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2  + Phosphene*150 - 10  , 410),(120,87)), LINETHICKNESS)
+            a = screen.blit(B1, (WINDOWWIDTH/2 -300, 670))
+            b = screen.blit(B2, (WINDOWWIDTH/2 -150, 670))
+            c = screen.blit(B3, (WINDOWWIDTH/2, 670))
+            d = screen.blit(B4, (WINDOWWIDTH/2 + 150, 670))
+            e = screen.blit(B5, (WINDOWWIDTH/2 + 300, 670))
             
             resultSurf = BASICFONT.render('     HOW CONFIDENT ARE YOU?', True, WHITE)
             resultRect = resultSurf.get_rect()
-            resultRect.center = (WINDOWWIDTH/2, 330)
+            resultRect.center = (WINDOWWIDTH/2, 630)
             screen.blit(resultSurf, resultRect)            
         
         if Confidence > 0:
-            pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2 -310 + ((Confidence-1)*150)  , 360),(120,87)), LINETHICKNESS)
-            ConfirmButton = screen.blit(CONFIRM, (WINDOWWIDTH/2 - 100, 620))
-            
+            pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2 -310 + ((Confidence-1)*150)  , 660),(120,87)), LINETHICKNESS)
+            ConfirmButton = screen.blit(CONFIRM, (WINDOWWIDTH/2 - 100, 920))
+        
+        pygame.mouse.set_visible(0)
         pygame.display.flip()
         pygame.display.update() 
         screen.fill(GREY)

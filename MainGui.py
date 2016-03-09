@@ -11,6 +11,8 @@ www.brainproducts.com
 
 """
 import interface
+import serial
+
 # needs socket and struct library
 from socket import *
 from struct import *
@@ -155,7 +157,7 @@ class testThread(Thread):
 
         # block counter to check overflows of tcpip buffer
         lastBlock = -1
-
+        self.ser = serial.Serial('COM1', 9600)
         #### Main Loop ####
         while not finish:
 
@@ -213,6 +215,7 @@ class testThread(Thread):
                             print 'checkarooni'
                             self.TMS_Mark = False
                             interface.TMS_Mark = False
+                            self.ser.write('0')
                             f.write('1')
                         else:
                             f.write('0')
