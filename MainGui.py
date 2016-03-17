@@ -257,7 +257,7 @@ class testGUI(wx.Frame):
     def __init__(self): 
         wx.Frame.__init__(self, None, -1, "EEG/TMS Panel", size=(500,700)) 
         panel = wx.Panel(self, -1)
-
+        wx.CallAfter(self.pollServer)
         self.FileText = wx.StaticText(panel, label="Filename:", pos=(30, 30))
         self.buttonFilename = wx.Button(panel, -1, label="Choose Filename", pos=(30,60))
         
@@ -265,7 +265,7 @@ class testGUI(wx.Frame):
         self.buttonTrigger = wx.Button(panel, -1, label="Send TMS Pulse", pos=(360,120))
         self.buttonRecord = wx.Button(panel, -1, label="Begin EEG Recording", pos=(30,180))
         self.buttonGameTime = wx.Button(panel, -1, label="Begin Automated TMS", pos=(30,240))
-        self.buttonTally = wx.Button(panel, -1, label="Tally Responses", pos=(360,240))
+        #self.buttonTally = wx.Button(panel, -1, label="Tally Responses", pos=(360,240))
         
         self.Ratelabel = wx.StaticText(panel, label="Confidence:", pos=(30, 340))
         self.YESlabel = wx.StaticText(panel, label="YES Phos:", pos=(30, 370))
@@ -304,7 +304,11 @@ class testGUI(wx.Frame):
         panel.Bind(wx.EVT_BUTTON, self.GameTime, id=self.buttonGameTime.GetId())
         panel.Bind(wx.EVT_BUTTON, self.startThread, id=self.buttonRecord.GetId())
         panel.Bind(wx.EVT_BUTTON, self.Trigger, id=self.buttonTrigger.GetId())
-        panel.Bind(wx.EVT_BUTTON, self.Tally, id=self.buttonTally.GetId())
+        #panel.Bind(wx.EVT_BUTTON, self.Tally, id=self.buttonTally.GetId())
+        
+        self.buttonConnect.Disable()
+        self.buttonGameTime.Disable()
+        self.buttonRecord.Disable()    
         
         self.sizer = wx.BoxSizer()
         self.sizer.Add(self.FileText, 1)
@@ -314,8 +318,11 @@ class testGUI(wx.Frame):
         panel.SetSizerAndFit(self.sizer)  
         self.Show()        
         
-        #self.buttonConnect.Disable()
-        self.buttonRecord.Disable()
+    def pollServer(self):
+        self.Tally()
+        wx.CallLater(2,self.pollServer)
+        
+        
         
     def startThread(self, event):
         self.the_thread = testThread(self)
@@ -329,9 +336,10 @@ class testGUI(wx.Frame):
         
     def GameTime(self, event):
         interface.StimTimer = True
-        print('test')
+
         
     def Connect(self, event):
+        self.buttonGameTime.Enable()
         interface.main()
         #self.the_thread = testThread(self)
         
@@ -339,7 +347,7 @@ class testGUI(wx.Frame):
         print('check')
         self.the_thread.TMS_Mark = True
         
-    def Tally(self, event):
+    def Tally(self):
     
         self.y1.SetLabel(str(interface.y1))
         self.y2.SetLabel(str(interface.y2))
@@ -357,6 +365,8 @@ class testGUI(wx.Frame):
         self.TotalYES.SetLabel(str(interface.y3 + interface.y4 + interface.y5))
         self.TotalNO.SetLabel(str(interface.n3 + interface.n4 + interface.n5))
         self.TotalStims.SetLabel(str(interface.y1 + interface.y2 + interface.y3 + interface.y4 + interface.y5 +  interface.n1 + interface.n2 + interface.n3 + interface.n4 + interface.n5 ))
+        
+        
         
         self.sizer.Layout()
         self.Refresh()
@@ -404,7 +414,9 @@ class testGUI(wx.Frame):
             self.FileText.SetLabel(filestring)
             self.sizer.Layout()
             print(["Filename: " + fname])
+            interface.filename = fname
             self.buttonRecord.Enable()
+            self.buttonConnect.Enable()
             self.Refresh()
             self.Update()
         #NFT.OutputFilename = fname[:-4] + 'MetaData.csv'

@@ -44,6 +44,11 @@ def main():
     
     global filename 
     
+    
+
+    
+    
+    
     pygame.init()
     pygame.display.init()      
     disp = pygame.display.Info()
@@ -51,6 +56,12 @@ def main():
     WINDOWHEIGHT = disp.current_h
     size = [WINDOWWIDTH,WINDOWHEIGHT]
 
+    
+    
+    
+
+
+    
     # # Set up the colours (RGB values)
     BLACK     = (0  ,0  ,0  )
     GREY      = (120  ,120  ,120  )
@@ -96,12 +107,13 @@ def main():
     Confidence = 0
     Phosphene = 0
     Reticle = False
+    RedReticle = False
     Responses = []
     #StimTimer = False
     StimGuard = time.time() - 10 #This variable prevents stims more frequent than 1 per ten seconds
     SubjectResponseTime = 0
     Stage = 1
-    
+    Stim_TimeBenchmark = time.time()
     if filename[-4:] == '.csv':
         marks = open(filename + '_RESPONSES.csv', 'w')
     else:
@@ -140,7 +152,7 @@ def main():
                                 n4 = n4 +1
                             if Confidence == 5:         
                                 n5 = n5 +1
-                        marks.write(str(Phosphene) + ',' + str(Confidence) + '\n')
+                        marks.write(str(Phosphene) + ',' + str(Confidence) + ',' + str(CountDownToStim-Stim_TimeBenchmark) + '\n')
                         Confidence = 0
                         Phosphene = 0
                         Stage = 1
@@ -171,24 +183,28 @@ def main():
                 if SubjectResponseTime > 3:
                     SubjectResponseTime = 3
                 CountDownToStim = time.time() + 8 - SubjectResponseTime
+                Reticle = True
                 print CountDownToStim
             elif Stage == 2:
                 if CountDownToStim < time.time() + 1:
-                    Reticle = True
+                    Reticle = False
+                    RedReticle = True
                 if CountDownToStim < time.time():
                     TMS_Mark = True
                     print('stim happens now')
                     Stage = 3
             elif Stage == 3:
                 if CountDownToStim < time.time() - 1:   
-                    Reticle = False
+                    RedReticle = False
                     SubjectResponseTimer = time.time()
+                    pygame.mouse.set_pos(WINDOWWIDTH/2, WINDOWHEIGHT/2)
                     Stage = 4
                     
         
 
-        
+        pygame.mouse.set_visible(0)
         if Stage == 4:
+            pygame.mouse.set_visible(1)
             resultSurf = BASICFONT.render('    DID YOU SEE A PHOSPHENE?', True, WHITE)
             resultRect = resultSurf.get_rect()
             resultRect.center = (WINDOWWIDTH/2, 380)
@@ -199,7 +215,11 @@ def main():
         if Reticle == True or StimTimer == False:
             pygame.draw.line(screen, WHITE, ((10+WINDOWWIDTH/2),WINDOWHEIGHT/2),((WINDOWWIDTH/2 - 10),WINDOWHEIGHT/2), (LINETHICKNESS/2))        
             pygame.draw.line(screen, WHITE, ((WINDOWWIDTH/2), 10+WINDOWHEIGHT/2),((WINDOWWIDTH/2),WINDOWHEIGHT/2-10), (LINETHICKNESS/2))
-        
+            
+        if RedReticle == True:
+            pygame.draw.line(screen, RED, ((10+WINDOWWIDTH/2),WINDOWHEIGHT/2),((WINDOWWIDTH/2 - 10),WINDOWHEIGHT/2), (LINETHICKNESS/2))        
+            pygame.draw.line(screen, RED, ((WINDOWWIDTH/2), 10+WINDOWHEIGHT/2),((WINDOWWIDTH/2),WINDOWHEIGHT/2-10), (LINETHICKNESS/2)) 
+            
         if Phosphene != 0:
             pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2  + Phosphene*150 - 10  , 410),(120,87)), LINETHICKNESS)
             a = screen.blit(B1, (WINDOWWIDTH/2 -300, 670))
@@ -217,12 +237,21 @@ def main():
             pygame.draw.rect(screen, CYAN, ((WINDOWWIDTH/2 -310 + ((Confidence-1)*150)  , 660),(120,87)), LINETHICKNESS)
             ConfirmButton = screen.blit(CONFIRM, (WINDOWWIDTH/2 - 100, 920))
         
-        pygame.mouse.set_visible(0)
+        
         pygame.display.flip()
         pygame.display.update() 
         screen.fill(GREY)
         if QuitFlag == True:
             print(Responses)
+            # markcounter = 0
+            # for mark in Responses:
+                # markcounter = markcounter + 1
+                # marks.write(mark)
+                # if markcounter == 1:
+                    # marks.write(',')
+                # else:
+                    # marks.write('\n')
+                    # markcounter = 0
             marks.close()
             
             
